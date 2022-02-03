@@ -4,6 +4,8 @@ import json
 import time
 from datetime import datetime
 
+PORT = 5000
+
 # alle Nutzer
 NUTZER = []
 
@@ -18,13 +20,17 @@ NACHRICHTEN = []
 
 def main():
 
+    gespeicherte_nachrichten_einlesen()
+    
     server = socket.socket()
-    server.bind(("", 5000))
+    server.bind(("", PORT))
     server.listen(30)
+
+    print("Server lauscht nun auf Port",PORT)
 
     while True:
         client, client_adresse = server.accept()
-        print("Verbindung mit", client_adresse, "aufgebaut)
+        print("Verbindung mit", client_adresse, "aufgebaut")
 
         # Ausführen von client_server_kommunikation() im Hintergrund durch Multithreading
         # So können mehrere Verbindungen/Programmabschnitte gleichzeitig ausgeführt werden
@@ -91,7 +97,23 @@ def nachricht_speichern(sender, empfangene_daten):
     
         
 
-
+def gespeicherte_nachrichten_einlesen():
+    try:
+        datei = open("nachrichten.log", "rt")
+        daten = datei.readlines()
+        datei.close()
+        if len(daten) > 0: 
+            NACHRICHTEN = json.loads(daten) # Daten wieder in Liste und Dictionary umwandeln
+            print("gespeicherte Nachrichten erfolgreich eingelesen")
+        else:
+            NACHRICHTEN = []
+            print("keine gespeicherten Nachrichten gefunden")
+    except FileNotFoundError:
+        NACHRICHTEN = []
+        datei = open("nachrichten.log", "x")
+        datei.close()
+        print("keine gespeicherten Nachrichten gefunden")
+        
 
 def empfangeStr(komm_s):
     weiter = True
@@ -122,5 +144,5 @@ def sendeTrennByte(komm_s):
     komm_s.sendall(trennByte)
 
 # Start
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
