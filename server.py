@@ -12,36 +12,48 @@ NACHRICHTEN = []
 ##        }]
 
 
-def main()
+def main():
 
-    verbindungs_s = socket.socket()
-    verbindungs_s.bind(("", 5000))
-    verbindungs_s.listen(30)
+    server = socket.socket()
+    server.bind(("", 5000))
+    server.listen(30)
 
     while True:
-        komm_s, client_adresse = verbindungs_s.accept()
+        client, client_adresse = server.accept()
         print("Verbindungsanfrage von", client_adresse)
 
-        komm_thread = threading.Thread(target=client_server_kommunikation, args=(komm_s,))
+        # Ausführen von client_server_kommunikation() im Hintergrund durch Multithreading
+        # So können mehrere Verbindungen/Programmabschnitte gleichzeitig ausgeführt werden
+        komm_thread = threading.Thread(target=client_server_kommunikation, args=(client,))
+        komm_thread.start()
         
 
-def client_server_kommunikation(komm_s):
+def client_server_kommunikation(client):
+    benutzername = ""
+    while True:
+        # Nachricht vom Client empfangen und verarbeiten
+        empfangen = empfangeStr(client)
+        # An der ersten Stelle ist immer der Typ der Nachricht
+        # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
+        nachrichtentyp = empfangen[0]
+        empfangen = empfangen[1:]
 
-    komm_s.close()
-        
+        if nachrichtentyp == "1": # Client schickt Benutzernamen
+            benutzername = empfangen
+        elif nachrichtentyp == "3": # Client schickt Nachricht
+            nachricht_speichern(benutzername, empfangen)
+        elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
+            nachrichten_an_client_schicken(client, benutzername)
+        else:
+            print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername)
+
+def nachricht_speichern(benutzername_sender, empfangene_daten):
+    pass
+
+def nachrichten_an_client_schicken(client, benutzername):
+    pass
 
 
-
-
-
-
-
-
-
-
-
-
-        
 
 def empfangeStr(komm_s):
     weiter = True
@@ -52,7 +64,10 @@ def empfangeStr(komm_s):
     while weiter:
         chunk = komm_s.recv(1)
         if chunk == endByte or chunk == bytes([]):
-            weiter = False
+            if len(datenBytes) > 0:
+                weiter = False
+            else:
+                print("leere Nachricht empfangen!")
         else:
             datenBytes = datenBytes + chunk
 
@@ -68,24 +83,5 @@ def sendeTrennByte(komm_s):
     trennByte = bytes([0])
     komm_s.sendall(trennByte)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Start
 main()
