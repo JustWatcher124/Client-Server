@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+import time
 
 # alle Nutzer
 NUTZER = []
@@ -10,7 +11,7 @@ NACHRICHTEN = []
 ##    [{"sender" : "...",
 ##      "empfaenger" : "...",
 ##      "nachricht" : "...",
-##      "datum" : "..."
+##      "datum" : "hh:mm:ss,DD:MM:YYYY"
 ##        }]
 
 
