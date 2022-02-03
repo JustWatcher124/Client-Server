@@ -1,5 +1,6 @@
 import socket
 import threading
+import json
 
 # alle Nutzer
 NUTZER = []
@@ -8,7 +9,8 @@ NUTZER = []
 NACHRICHTEN = []
 ##    [{"sender" : "...",
 ##      "empfaenger" : "...",
-##      "nachricht" : "..."
+##      "nachricht" : "...",
+##      "datum" : "..."
 ##        }]
 
 
@@ -47,10 +49,18 @@ def client_server_kommunikation(client):
         else:
             print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername)
 
-def nachricht_speichern(benutzername_sender, empfangene_daten):
-    pass
-
 def nachrichten_an_client_schicken(client, benutzername):
+    # Nachrichten, die vom oder an den Client gesendet wurden
+    nachrichten_mit_client = [n for n in NACHRICHTEN if n["sender"] == benutzername or n["empfaenger"] == benutzername]
+
+    # in String umwandeln
+    nachrichten_als_string = json.dumps(nachrichten_mit_client)
+    
+    sendeStr(client, nachrichten_als_string)
+    sendeTrennByte(client)
+    
+
+def nachricht_speichern(benutzername_sender, empfangene_daten):
     pass
 
 
