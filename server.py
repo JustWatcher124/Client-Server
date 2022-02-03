@@ -94,6 +94,12 @@ def nachricht_speichern(sender, empfangene_daten):
         "nachricht" : nachricht,
         "datum" : datum
         })
+
+    # "Backup" der Nachrichten in externer Datei "nachrichten.log" speichern
+    nachrichten_str = json.dumps(NACHRICHTEN)
+    nachrichten_datei = open("nachrichten.log", "wt")
+    nachrichten_datei.write(nachrichten_str)
+    nachrichten_datei.close()
     
         
 
