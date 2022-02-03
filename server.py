@@ -22,7 +22,7 @@ def main():
 
     while True:
         client, client_adresse = server.accept()
-        print("Verbindungsanfrage von", client_adresse)
+        print("Verbindung mit", client_adresse, "aufgebaut)
 
         # Ausführen von client_server_kommunikation() im Hintergrund durch Multithreading
         # So können mehrere Verbindungen/Programmabschnitte gleichzeitig ausgeführt werden
@@ -42,10 +42,13 @@ def client_server_kommunikation(client):
 
         if nachrichtentyp == "1": # Client schickt Benutzernamen
             benutzername = empfangen
+            print(benutzername, "ist nun angemeldet")
         elif nachrichtentyp == "3": # Client schickt Nachricht
             nachricht_speichern(benutzername, empfangen)
+            print("Nachricht von", benutzername, "gespeichert")
         elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
             nachrichten_an_client_schicken(client, benutzername)
+            print("Nachrichten an", benutzername, "gesendet")
         else:
             print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername)
 
