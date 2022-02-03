@@ -2,6 +2,7 @@ import socket
 import threading
 import json
 import time
+from datetime import datetime
 
 # alle Nutzer
 NUTZER = []
@@ -64,8 +65,31 @@ def nachrichten_an_client_schicken(client, benutzername):
     sendeTrennByte(client)
     
 
-def nachricht_speichern(benutzername_sender, empfangene_daten):
-    pass
+def nachricht_speichern(sender, empfangene_daten):
+    # Aufbau von empfangene_daten: "Empfänger Nachricht" -> Ab Leerzeichen nach Empfänger beginnt Nachricht
+    index_trennzeichen = empfangene_daten.index(" ")
+    empfaenger = empfangene_daten[:index_trennzeichen]
+    nachricht = empfangene_daten[index_trennzeichen+1:]
+
+    # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
+    jetzt = datetime.now()
+    stunde = str(datetime.hour)
+    minute = str(datetime.minute)
+    sekunde = str(datetime.second)
+    tag = str(datetime.day)
+    monat = str(datetime.month)
+    jahr = str(datetime.year)
+    datum = "{hh}:{mm}:{ss},{DD}:{MM}:{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
+
+    # Nachricht mit Daten in der globalen Liste speichern
+    NACHRICHTEN.append({
+        "sender" : sender,
+        "empfaenger" : empfaenger,
+        "nachricht" : nachricht,
+        "datum" : datum
+        })
+    
+        
 
 
 
@@ -98,4 +122,5 @@ def sendeTrennByte(komm_s):
     komm_s.sendall(trennByte)
 
 # Start
-main()
+if __name__ = "__main__":
+    main()
