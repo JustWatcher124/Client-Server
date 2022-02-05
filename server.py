@@ -54,6 +54,8 @@ def main():
         
 
 def client_server_kommunikation(args):
+    global NACHRICHTEN
+
     client, client_adresse = args
     benutzername = ""
     try: 
@@ -70,6 +72,7 @@ def client_server_kommunikation(args):
             elif nachrichtentyp == "1": # Client schickt Benutzernamen
                 benutzername = empfangen
                 if benutzername not in NACHRICHTEN.keys():
+                    print(1, NACHRICHTEN)
                     benutzer_registrieren(benutzername)
                 print(client_adresse, "ist nun als", benutzername, "angemeldet")
             elif nachrichtentyp == "3": # Client schickt Nachricht
@@ -82,17 +85,22 @@ def client_server_kommunikation(args):
                 print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
                 
     except ConnectionResetError:
-        print(client_adresse, "hat die Verbindung getrennt")
+        print(benutzername, client_adresse, "hat die Verbindung getrennt")
         return # beendet diese Funktion und diesen Thread
 
 def benutzer_registrieren(neuer_nutzer):
+    global NACHRICHTEN
     # benutzername als neuen Kommunikationspartner bei allen aneren Nutzern hinzufügen
     for nutzer in NACHRICHTEN.keys():
         NACHRICHTEN[nutzer][neuer_nutzer] = []
 
+    print(2, NACHRICHTEN)
+
     # benutzername als neuen Nutzer zu Nachrichten hinzufügen
     alle_anderen_nutzer = NACHRICHTEN.keys()
     NACHRICHTEN[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
+
+    print(3, NACHRICHTEN)
 
     # Änderungen in nachrichten.json speichern
     nachrichten_str = json.dumps(NACHRICHTEN)
@@ -100,8 +108,12 @@ def benutzer_registrieren(neuer_nutzer):
     nachrichten_datei.write(nachrichten_str)
     nachrichten_datei.close()
 
+    print(4, NACHRICHTEN)
+
 
 def nachrichten_an_client_schicken(client, benutzername):
+    global NACHRICHTEN
+
     # alle Chats des benutzers
     nachrichten_mit_client = NACHRICHTEN[benutzername]
 
@@ -116,16 +128,34 @@ def nachrichten_an_client_schicken(client, benutzername):
     
 
 def nachricht_speichern(sender, empfangene_daten):
+    global NACHRICHTEN
+
     # Aufbau von empfangene_daten: {"sender": "...",
     #                  "empfaenger": "...",
-    #                  "datum": "hh:mm:ss,DD:MM:YYYY",
     #                  "nachricht": "..."}
     #                 }
 
-    nachricht = json.loads(daten)
+    nachricht = json.loads(empfangene_daten)
+
+    # Datum muss noch hinzugefügt werden
+    # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
+    jetzt = datetime.now()
+    stunde = str(datetime.hour)
+    minute = str(datetime.minute)
+    sekunde = str(datetime.second)
+    tag = str(datetime.day)
+    monat = str(datetime.month)
+    jahr = str(datetime.year)
+    datum = "{hh}:{mm}:{ss},{DD}:{MM}:{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
+
+    # Datum in Nachricht speichern
+    nachricht["datum"] = datum
+
+    # Empfänger und Sender aus Nachricht auslesen
     empfaenger = nachricht["empfaenger"]
     sender = nachricht["sender"]
 
+    # Nachricht bei Sender und Empfänger speichern
     NACHRICHTEN[empfaenger][sender].append(nachricht)
     NACHRICHTEN[sender][empfaenger].append(nachricht)
 
@@ -138,15 +168,18 @@ def nachricht_speichern(sender, empfangene_daten):
         
 
 def nachrichten_backup_einlesen():
+    global NACHRICHTEN
+
     # Versuchen Datei einzulesen
     try:
         datei = open("nachrichten.json", "rt")
-        daten = datei.readlines()
+        daten = datei.read()
         datei.close()
         
         if len(daten) > 0: # Falls Daten vorhanden
             NACHRICHTEN = json.loads(daten) # Daten durch JSON-Modul wieder in Liste und Dictionary umwandeln            
             print("gespeicherte Nachrichten erfolgreich eingelesen")
+            print(NACHRICHTEN)
             
         else: # Falls Datei leer
             NACHRICHTEN = {}
