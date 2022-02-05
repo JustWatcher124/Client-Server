@@ -99,8 +99,9 @@ def client_server_kommunikation(args):
         return # beendet diese Funktion und diesen Thread
 
 def chatuebersicht_schicken(client, benutzername):
-    chats = NACHRICHTEN["benutzername"]
+    chats = NACHRICHTEN[benutzername]
 
+    # Chatübersicht generieren
     chatuebersicht = {} # {"Name": Anzahl ungelesenen Nachrichten,}
     for n in chats.keys():
         ungelesene_nachrichten = berechne_ungelesene_nachrichten(benutzername, chats[n])
@@ -119,7 +120,7 @@ def chatuebersicht_schicken(client, benutzername):
 
 def berechne_ungelesene_nachrichten(anfragesteller, chatListe):
     ungelesene_nachrichten = 0
-    for i in range(len(x)-1,-1,-1): # durchläuft Indices der Liste rückwärts
+    for i in range(len(chatListe)-1,-1,-1): # durchläuft Indices der Liste rückwärts
         if chatListe[i]["empfaenger"] == anfragesteller and not chatListe[i]["gelesen"]:
             ungelesene_nachrichten += 1
         else:
