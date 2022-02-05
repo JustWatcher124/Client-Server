@@ -123,9 +123,9 @@ def nachricht_speichern(sender, empfangene_daten):
         "datum" : datum
         })
 
-    # "Backup" der Nachrichten in externer Datei "nachrichten.log" speichern
+    # "Backup" der Nachrichten in externer Datei "nachrichten.json" speichern
     nachrichten_str = json.dumps(NACHRICHTEN) # Liste durch JSON-Modul in String umwandeln
-    nachrichten_datei = open("nachrichten.log", "wt")
+    nachrichten_datei = open("nachrichten.json", "wt")
     nachrichten_datei.write(nachrichten_str)
     nachrichten_datei.close()
     
@@ -134,7 +134,7 @@ def nachricht_speichern(sender, empfangene_daten):
 def nachrichten_backup_einlesen():
     # Versuchen Datei einzulesen
     try:
-        datei = open("nachrichten.log", "rt")
+        datei = open("nachrichten.json", "rt")
         daten = datei.readlines()
         datei.close()
         
@@ -146,9 +146,9 @@ def nachrichten_backup_einlesen():
             NACHRICHTEN = []
             print("keine gespeicherten Nachrichten gefunden")
             
-    except FileNotFoundError: # Falls "nachrichten.log" noch nicht existiert
+    except FileNotFoundError: # Falls "nachrichten.json" noch nicht existiert
         NACHRICHTEN = []
-        datei = open("nachrichten.log", "x")
+        datei = open("nachrichten.json", "x")
         datei.close()
         print("keine gespeicherten Nachrichten gefunden")
         
