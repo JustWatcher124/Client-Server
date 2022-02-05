@@ -10,3 +10,7 @@ def nachrichtFjson(string):
 
 def getKommPartner(string):
     return json.loads(string).keys()
+
+
+def nachrichtTjson(sender,empfaenger,nachricht):
+    return str({"sender":sender,"empfaenger":empfaenger,"nachricht":nachricht})

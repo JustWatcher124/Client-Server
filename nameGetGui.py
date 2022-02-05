@@ -14,11 +14,11 @@ def initNickFenster(gui):
     global window
     window = gui
     l = tk.Label(window,text="""Bitte geben Sie einen Benutzernamen ein.\n
-    (Ohne Leerzeichen und Komma)""",width=100).grid()
-    t = tk.Text(window,height = 1, width =45)
+    (Ohne Leerzeichen und Komma)""").grid()
+    nick_in = tk.Text(window,height = 1, width =45)
     e = tk.Label(window,text="")
-    t.grid(row=1,column=0)
-    tk.Button(window,text="Fertig",command= lambda: goodNick(t,e)).grid(row=1,column=1)
+    nick_in.grid(row=1,column=0)
+    tk.Button(window,text="Fertig",command= lambda: goodNick(nick_in,e)).grid(row=1,column=1)
     e.grid(row=2)
     tk.Button(window,text="Abbrechen",command=abbruch).grid()
     tk.Button(window,text="Standard", command=standard).grid()
