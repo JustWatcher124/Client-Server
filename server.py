@@ -157,7 +157,7 @@ def nachrichten_backup_einlesen():
     # Versuchen Datei einzulesen
     try:
         datei = open("nachrichten.json", "rt")
-        daten = datei.readlines()
+        daten = datei.read()
         datei.close()
         
         if len(daten) > 0: # Falls Daten vorhanden
