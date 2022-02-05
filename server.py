@@ -126,8 +126,8 @@ def nachricht_speichern(sender, empfangene_daten):
     empfaenger = nachricht["empfaenger"]
     sender = nachricht["sender"]
 
-
-
+    NACHRICHTEN[empfaenger][sender].append(nachricht)
+    NACHRICHTEN[sender][empfaenger].append(nachricht)
 
     # "Backup" der Nachrichten in externer Datei "nachrichten.json" speichern
     nachrichten_str = json.dumps(NACHRICHTEN) # Liste durch JSON-Modul in String umwandeln
@@ -149,11 +149,11 @@ def nachrichten_backup_einlesen():
             print("gespeicherte Nachrichten erfolgreich eingelesen")
             
         else: # Falls Datei leer
-            NACHRICHTEN = []
+            NACHRICHTEN = {}
             print("keine gespeicherten Nachrichten gefunden")
             
     except FileNotFoundError: # Falls "nachrichten.json" noch nicht existiert
-        NACHRICHTEN = []
+        NACHRICHTEN = {}
         datei = open("nachrichten.json", "x")
         datei.close()
         print("keine gespeicherten Nachrichten gefunden")
