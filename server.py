@@ -40,7 +40,6 @@ NACHRICHTEN = {}
 ##          ]
 ##      }
 
-
 def main():
 
     nachrichten_backup_einlesen()
@@ -83,12 +82,14 @@ def client_server_kommunikation(args):
                 if benutzername not in NACHRICHTEN.keys():
                     benutzer_registrieren(benutzername)
                 print(client_adresse, "ist nun als", benutzername, "angemeldet")
-            elif nachrichtentyp == "3": # Client schickt Nachricht
-                nachricht_speichern(benutzername, empfangen)
-                print("Nachricht von", benutzername, client_adresse, "gespeichert")
+            elif nachrichtentyp == "2": # Client frägt Chatübersicht an
+                pass
             elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
                 nachrichten_an_client_schicken(client, benutzername)
                 print("Nachrichten an", benutzername, "gesendet")
+            elif nachrichtentyp == "6": # Client schickt Nachricht
+                nachricht_speichern(benutzername, empfangen)
+                print("Nachricht von", benutzername, client_adresse, "gespeichert")
             else:
                 print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
                 
@@ -153,6 +154,8 @@ def nachricht_speichern(sender, empfangene_daten):
 
     # Datum in Nachricht speichern
     nachricht["datum"] = datum
+    # Lesestatus in Nachricht speichern
+    nachricht["gelesen"] = False
 
     # Empfänger und Sender aus Nachricht auslesen
     empfaenger = nachricht["empfaenger"]
