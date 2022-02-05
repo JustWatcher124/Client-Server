@@ -7,13 +7,21 @@ from datetime import datetime
 # Aufbau des empfangenen Strings bei Kommunikation immer:
 #  1. Zeichen: Nachrichtencode
 #  ab 2. Zeichen: Nutzdaten
-# (Nachrichtencodes, zum identifizieren, welche Art von Daten empfangen wurden)
-# 1-> Client schickt Benutzername an Server
-# 2->
-# 3-> Benutzer hat neue Nachricht gesendet -> Server speichert nun die Nachricht
-# 4-> Client fordert von ihm und an ihn gesendete Nachrichten an -> Server antwortet mit 5
-# 5-> Server schickt alle Nachrichten von und an Benutzer an dessen Client
 
+# Nachrichtencodes (zum identifizieren, welche Art von Daten empfangen wurden)
+# 1-> Client schickt Benutzername an Server -> 1Name
+# 2-> Client frägt Chatübersicht an -> 2
+# 3-> Server schickt Client Chatüberischt -> 3{"Name": Anzahl ungelesenen Nachrichten,}
+# 4-> Client frägt Chat an -> 4Kommunikationspartner
+# 5-> Server schickt alle Nachrichten von und an Benutzer an dessen Client ->5[Liste der Nachrichten]
+# 6-> Benutzer hat neue Nachricht (ohne Datum) gesendet, Server speichert nun die Nachricht ->6{Nachricht}
+
+# Aufbau einer Nachricht:
+#   {"sender": "...",
+#    "empfaenger": "...",
+#    "datum": "hh:mm:ss,DD:MM:YYYY",
+#    "nachricht": "..."}
+#    }
 
 PORT = 5000
 
@@ -62,6 +70,7 @@ def client_server_kommunikation(args):
         # Nachrichten vom Client empfangen und verarbeiten
         while True:
             empfangen = empfangeStr(client)
+            print("log", client_adresse, empfangen)
             # An der ersten Stelle ist immer der Typ der Nachricht festgelegt
             # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
             nachrichtentyp = empfangen[0]
@@ -72,7 +81,6 @@ def client_server_kommunikation(args):
             elif nachrichtentyp == "1": # Client schickt Benutzernamen
                 benutzername = empfangen
                 if benutzername not in NACHRICHTEN.keys():
-                    print(1, NACHRICHTEN)
                     benutzer_registrieren(benutzername)
                 print(client_adresse, "ist nun als", benutzername, "angemeldet")
             elif nachrichtentyp == "3": # Client schickt Nachricht
@@ -94,21 +102,16 @@ def benutzer_registrieren(neuer_nutzer):
     for nutzer in NACHRICHTEN.keys():
         NACHRICHTEN[nutzer][neuer_nutzer] = []
 
-    print(2, NACHRICHTEN)
-
     # benutzername als neuen Nutzer zu Nachrichten hinzufügen
     alle_anderen_nutzer = NACHRICHTEN.keys()
     NACHRICHTEN[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
 
-    print(3, NACHRICHTEN)
 
     # Änderungen in nachrichten.json speichern
     nachrichten_str = json.dumps(NACHRICHTEN)
     nachrichten_datei = open("nachrichten.json", "wt")
     nachrichten_datei.write(nachrichten_str)
     nachrichten_datei.close()
-
-    print(4, NACHRICHTEN)
 
 
 def nachrichten_an_client_schicken(client, benutzername):
