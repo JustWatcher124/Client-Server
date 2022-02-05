@@ -161,7 +161,13 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     
     sendeStr(client, chat_als_string)
     sendeTrennByte(client)
-    
+
+    # nachrichten auf gelesen setzen
+    for i in range(len(chat) - 1, -1, -1):  # durchläuft Indices der Liste rückwärts
+        if chat[i]["gelesen"] == True: # bricht ab, wenn gelesene Nachricht gefunden wird
+            break
+        else:
+            chat[i]["gelesen"] = True # setzt Nachricht auf gelesen
 
 def nachricht_speichern(sender, empfangene_daten):
     global NACHRICHTEN
