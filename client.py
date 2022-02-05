@@ -29,3 +29,6 @@ except:
 else:
     print("Alles Gut")
     auswahlGui.starteGui(client,nickname)
+socketLib.sendeStr(client,"0");socketLib.sendeTrennByte(client)
+client.close()
+print("Schönen Tag noch")

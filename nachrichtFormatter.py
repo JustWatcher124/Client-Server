@@ -17,16 +17,11 @@ def nachrichtTjson(sender,empfaenger,nachricht):
     return str(x)
 
 def verlaufToJson(verlaufs_string):
-    s = ""
     res = verlaufs_string.strip('][').split('}, ')
     messages = []
     for quickfix in res:
         if "}" not in quickfix:
-            messages.append(quickfix+"}")
+            messages.append(json.loads(quickfix+"}"))
         else:
-            messages.append(quickfix)
-    for mes in messages:
-        print(mes)
-        message = json.loads(mes)
-        s+=message["sender"]+"\n"
-    return s
+            messages.append(json.loads(quickfix))
+    return messages

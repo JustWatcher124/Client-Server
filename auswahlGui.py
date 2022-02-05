@@ -28,12 +28,13 @@ def gui(fenster,names):
 
 
 def chat_beginnen(nc,er_nc):
-    global window, chat_partner
+    global window, chat_partner, new_chat
     name = nc.get(1.0,"end-1c")
     if " " in name or "," in name:
         er_nc.config(text="Unzulässiger Name")
     else:
         chat_partner = name
+        new_chat = True
         print("Neuer Chat mit:",chat_partner)
         window.destroy()
 
@@ -42,7 +43,7 @@ def get_Komm_Partner():
     global client
     sendeStr(client,"2"); sendeTrennByte(client)
     raw = empfangeStr(client)
-    print(raw,"Raw empfangen beim Anfragen auf Chatverläufe")
+    # print(raw,"Raw empfangen beim Anfragen auf Chatverläufe")
     return getKommPartner(raw[1:])
 
 
@@ -67,14 +68,15 @@ def guiSchliessen():
 
 
 def chat_Aufruf(name):
-    global window, chat_partner
+    global window, chat_partner, new_chat
     chat_partner = name
+    new_chat = False
     print("Chat mit",chat_partner," aufgerufen")
     window.destroy()
 
 
 def starteGui(client_socket,nick):
-    global client, nickname, chat_partner
+    global client, nickname, chat_partner, new_chat
     client = client_socket
     nickname = nick
     app = tk.Tk()
@@ -82,4 +84,4 @@ def starteGui(client_socket,nick):
     app.title("Chatauswahl")
     app = gui(app,partner)
     app.mainloop()
-    chatGui.starteGui(client,nickname,chat_partner)
+    chatGui.starteGui(client,nickname,chat_partner,new_chat)
