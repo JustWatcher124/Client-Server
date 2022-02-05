@@ -85,9 +85,10 @@ def client_server_kommunikation(args):
             elif nachrichtentyp == "2": # Client frägt Chatübersicht an
                 chatuebersicht_schicken(client, benutzername)
                 print("Chatüberischt wurde an", benutzername, client_adresse, "geschickt")
-            elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
-                nachrichten_an_client_schicken(client, benutzername)
-                print("Nachrichten an", benutzername, "gesendet")
+            elif nachrichtentyp == "4": # Client fordert Chatverlauf mit Kommunikationspartner an
+                kommunikationspartner = empfangen
+                chat_an_client_schicken(client, benutzername, kommunikationspartner)
+                print("Chatverlauf mit", kommunikationspartner,"an", benutzername, client_adresse, "gesendet")
             elif nachrichtentyp == "6": # Client schickt Nachricht
                 nachricht_speichern(benutzername, empfangen)
                 print("Nachricht von", benutzername, client_adresse, "gespeichert")
@@ -146,19 +147,19 @@ def benutzer_registrieren(neuer_nutzer):
     nachrichten_datei.close()
 
 
-def nachrichten_an_client_schicken(client, benutzername):
+def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     global NACHRICHTEN
 
-    # alle Chats des benutzers
-    nachrichten_mit_client = NACHRICHTEN[benutzername]
+    # alle Nachrichten des Benutzers mit dem Kommunikationspartner
+    chat = NACHRICHTEN[benutzername][kommunikationspartner]
 
     # Dictionary durch JSON-Modul in String umwandeln
-    nachrichten_als_string = json.dumps(nachrichten_mit_client)
+    chat_als_string = json.dumps(chat)
 
     # Nummer des Nachrichtentyps anfügen
-    nachrichten_als_string = "5" + nachrichten_als_string
+    chat_als_string = "5" + chat_als_string
     
-    sendeStr(client, nachrichten_als_string)
+    sendeStr(client, chat_als_string)
     sendeTrennByte(client)
     
 
