@@ -66,7 +66,7 @@ def guiSchliessen():
 
 
 def chat_Aufruf(name):
-    global window
+    global window, chat_partner
     chat_partner = name
     print("Chat mit",chat_partner," aufgerufen")
     window.destroy()
