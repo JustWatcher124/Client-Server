@@ -40,7 +40,6 @@ NACHRICHTEN = {}
 ##          ]
 ##      }
 
-
 def main():
 
     nachrichten_backup_einlesen()
@@ -83,18 +82,52 @@ def client_server_kommunikation(args):
                 if benutzername not in NACHRICHTEN.keys():
                     benutzer_registrieren(benutzername)
                 print(client_adresse, "ist nun als", benutzername, "angemeldet")
-            elif nachrichtentyp == "3": # Client schickt Nachricht
+            elif nachrichtentyp == "2": # Client frägt Chatübersicht an
+                chatuebersicht_schicken(client, benutzername)
+                print("Chatüberischt wurde an", benutzername, client_adresse, "geschickt")
+            elif nachrichtentyp == "4": # Client fordert Chatverlauf mit Kommunikationspartner an
+                kommunikationspartner = empfangen
+                chat_an_client_schicken(client, benutzername, kommunikationspartner)
+                print("Chatverlauf mit", kommunikationspartner,"an", benutzername, client_adresse, "gesendet")
+            elif nachrichtentyp == "6": # Client schickt Nachricht
                 nachricht_speichern(benutzername, empfangen)
                 print("Nachricht von", benutzername, client_adresse, "gespeichert")
-            elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
-                nachrichten_an_client_schicken(client, benutzername)
-                print("Nachrichten an", benutzername, "gesendet")
             else:
                 print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
                 
     except ConnectionResetError:
         print(benutzername, client_adresse, "hat die Verbindung getrennt")
         return # beendet diese Funktion und diesen Thread
+
+def chatuebersicht_schicken(client, benutzername):
+    chats = NACHRICHTEN[benutzername]
+
+    # Chatübersicht generieren
+    chatuebersicht = {} # {"Name": Anzahl ungelesenen Nachrichten,}
+    for n in chats.keys():
+        ungelesene_nachrichten = berechne_ungelesene_nachrichten(benutzername, chats[n])
+        chatuebersicht[n] = ungelesene_nachrichten
+
+    # Dictionary durch JSON-Modul in String umwandeln
+    chatuebersicht_als_string = json.dumps(chatuebersicht)
+
+    # Nummer des Nachrichtentyps anfügen
+    chatuebersicht_als_string = "3" + chatuebersicht_als_string
+
+    sendeStr(client, chatuebersicht_als_string)
+    sendeTrennByte(client)
+
+
+
+def berechne_ungelesene_nachrichten(anfragesteller, chatListe):
+    ungelesene_nachrichten = 0
+    for i in range(len(chatListe)-1,-1,-1): # durchläuft Indices der Liste rückwärts
+        if chatListe[i]["empfaenger"] == anfragesteller and not chatListe[i]["gelesen"]:
+            ungelesene_nachrichten += 1
+        else:
+            break
+    return ungelesene_nachrichten
+
 
 def benutzer_registrieren(neuer_nutzer):
     global NACHRICHTEN
@@ -114,24 +147,31 @@ def benutzer_registrieren(neuer_nutzer):
     nachrichten_datei.close()
 
 
-def nachrichten_an_client_schicken(client, benutzername):
+def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     global NACHRICHTEN
 
-    # alle Chats des benutzers
-    nachrichten_mit_client = NACHRICHTEN[benutzername]
+    # alle Nachrichten des Benutzers mit dem Kommunikationspartner
+    chat = NACHRICHTEN[benutzername][kommunikationspartner]
 
     # Dictionary durch JSON-Modul in String umwandeln
-    nachrichten_als_string = json.dumps(nachrichten_mit_client)
+    chat_als_string = json.dumps(chat)
 
     # Nummer des Nachrichtentyps anfügen
-    nachrichten_als_string = "5" + nachrichten_als_string
+    chat_als_string = "5" + chat_als_string
     
-    sendeStr(client, nachrichten_als_string)
+    sendeStr(client, chat_als_string)
     sendeTrennByte(client)
-    
+
+    # Nachrichten auf gelesen setzen
+    for i in range(len(chat) - 1, -1, -1):  # durchläuft Indices der Liste rückwärts
+        if chat[i]["gelesen"] == True: # bricht ab, wenn gelesene Nachricht gefunden wird
+            break
+        else:
+            chat[i]["gelesen"] = True # setzt Nachricht auf gelesen
 
 def nachricht_speichern(sender, empfangene_daten):
     global NACHRICHTEN
+
 
     # Aufbau von empfangene_daten: {"sender": "...",
     #                  "empfaenger": "...",
@@ -139,6 +179,11 @@ def nachricht_speichern(sender, empfangene_daten):
     #                 }
 
     nachricht = json.loads(empfangene_daten)
+
+    # falls Empfänger noch nicht im registriert ist
+    empfaenger = nachricht["empfaenger"]
+    if empfaenger not in NACHRICHTEN.keys():
+        benutzer_registrieren(empfaenger)
 
     # Datum muss noch hinzugefügt werden
     # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
@@ -153,6 +198,8 @@ def nachricht_speichern(sender, empfangene_daten):
 
     # Datum in Nachricht speichern
     nachricht["datum"] = datum
+    # Lesestatus in Nachricht speichern
+    nachricht["gelesen"] = False
 
     # Empfänger und Sender aus Nachricht auslesen
     empfaenger = nachricht["empfaenger"]
