@@ -28,7 +28,7 @@ def chatSchliessen():
 def text_absenden(text):
     global client
     nachricht = text.get(1.0,"end-1c")
-
+    nachricht_zum_server(nachricht)
 
 def nachricht_zum_server(nachricht):
     global nickname, komm_partner
@@ -38,9 +38,9 @@ def nachricht_zum_server(nachricht):
 
 def refresh(chat_verlauf):
     global client, nickname
-    socketLib.sendeStr(client,"4"+nickname)
-    socketLib.sendeTrennByte(client)
-    nachricht_raw = socketLib.empfangeStr(client)
+    sendeStr(client,"4"+nickname)
+    sendeTrennByte(client)
+    nachricht_raw = empfangeStr(client)
     nachricht = nachrichtFTjson.nachrichtFjson(nachricht_raw[1:])
 
 def starteGui(client_socket,nick,partner):
