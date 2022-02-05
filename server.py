@@ -83,7 +83,8 @@ def client_server_kommunikation(args):
                     benutzer_registrieren(benutzername)
                 print(client_adresse, "ist nun als", benutzername, "angemeldet")
             elif nachrichtentyp == "2": # Client frägt Chatübersicht an
-                pass
+                chatuebersicht_schicken(client, benutzername)
+                print("Chatüberischt wurde an", benutzername, client_adresse, "geschickt")
             elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
                 nachrichten_an_client_schicken(client, benutzername)
                 print("Nachrichten an", benutzername, "gesendet")
@@ -96,6 +97,35 @@ def client_server_kommunikation(args):
     except ConnectionResetError:
         print(benutzername, client_adresse, "hat die Verbindung getrennt")
         return # beendet diese Funktion und diesen Thread
+
+def chatuebersicht_schicken(client, benutzername):
+    chats = NACHRICHTEN["benutzername"]
+
+    chatuebersicht = {} # {"Name": Anzahl ungelesenen Nachrichten,}
+    for n in chats.keys():
+        ungelesene_nachrichten = berechne_ungelesene_nachrichten(benutzername, chats[n])
+        chatuebersicht[n] = ungelesene_nachrichten
+
+    # Dictionary durch JSON-Modul in String umwandeln
+    chatuebersicht_als_string = json.dumps(chatuebersicht)
+
+    # Nummer des Nachrichtentyps anfügen
+    chatuebersicht_als_string = "3" + chatuebersicht_als_string
+
+    sendeStr(client, chatuebersicht_als_string)
+    sendeTrennByte(client)
+
+
+
+def berechne_ungelesene_nachrichten(anfragesteller, chatListe):
+    ungelesene_nachrichten = 0
+    for i in range(len(x)-1,-1,-1): # durchläuft Indices der Liste rückwärts
+        if chatListe[i]["empfaenger"] == anfragesteller and not chatListe[i]["gelesen"]:
+            ungelesene_nachrichten += 1
+        else:
+            break
+    return ungelesene_nachrichten
+
 
 def benutzer_registrieren(neuer_nutzer):
     global NACHRICHTEN
