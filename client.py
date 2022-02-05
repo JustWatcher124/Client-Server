@@ -3,6 +3,7 @@ import nameGetGui
 import socketLib
 import socket
 import chatGui
+import auswahlGui
 print('''Willkommen bei unserem super-tollem-Nachrichtensystem,
 bevor es losgehen kann, brauchen Wir die IP des Servers an.
 (Es sollte sich ein neues Fenster geöffnet haben)''')
@@ -29,4 +30,4 @@ else:
     print("Alles Gut")
 
 
-chatGui.starteChat(client,nickname)
+auswahlGui.starteGui(client,nickname)
