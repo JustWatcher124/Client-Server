@@ -28,6 +28,4 @@ except:
     print("Etwas unvorhergesehenes ist passiert")
 else:
     print("Alles Gut")
-
-
     auswahlGui.starteGui(client,nickname)

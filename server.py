@@ -156,6 +156,7 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
 
     # Dictionary durch JSON-Modul in String umwandeln
     chat_als_string = json.dumps(chat)
+    print(chat_als_string)
 
     # Nummer des Nachrichtentyps anfügen
     chat_als_string = "5" + chat_als_string
@@ -189,12 +190,12 @@ def nachricht_speichern(sender, empfangene_daten):
     # Datum muss noch hinzugefügt werden
     # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
     jetzt = datetime.now()
-    stunde = str(datetime.hour)
-    minute = str(datetime.minute)
-    sekunde = str(datetime.second)
-    tag = str(datetime.day)
-    monat = str(datetime.month)
-    jahr = str(datetime.year)
+    stunde = str(jetzt.hour)
+    minute = str(jetzt.minute)
+    sekunde = str(jetzt.second)
+    tag = str(jetzt.day)
+    monat = str(jetzt.month)
+    jahr = str(jetzt.year)
     datum = "{hh}:{mm}:{ss},{DD}:{MM}:{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
 
     # Datum in Nachricht speichern

@@ -1,5 +1,5 @@
 import tkinter as tk
-from nachrichtFTjson import *
+from nachrichtFormatter import *
 from socketLib import *
 import chatGui
 chat_partner = ""
@@ -40,9 +40,10 @@ def chat_beginnen(nc,er_nc):
 
 def get_Komm_Partner():
     global client
-    #sendeStr(client,"2"); sendeTrennByte(client)
-    #raw = empfangeStr(client)
-    return ["jw124"]
+    sendeStr(client,"2"); sendeTrennByte(client)
+    raw = empfangeStr(client)
+    print(raw,"Raw empfangen beim Anfragen auf Chatverläufe")
+    return getKommPartner(raw[1:])
 
 
 def clear_widgets(tk_frame):
@@ -56,7 +57,7 @@ def refresh(partners,names):
         for partner in names:
             tk.Button(partners,text=partner, command= lambda: chat_Aufruf(partner)).pack()
     else:
-        tk.Label(text="Sie haben keine Chatverläufe!")
+        tk.Label(partners,text="Sie haben keine Chatverläufe!").pack()
     return partners
 
 
