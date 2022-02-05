@@ -33,11 +33,12 @@ def main():
 
         # Ausführen von client_server_kommunikation() im Hintergrund durch Multithreading
         # So können mehrere Verbindungen/Programmabschnitte gleichzeitig und parallel ausgeführt werden
-        komm_thread = threading.Thread(target=client_server_kommunikation, args=(client,))
+        komm_thread = threading.Thread(target=client_server_kommunikation, args=((client,client_adresse),))
         komm_thread.start()
         
 
-def client_server_kommunikation(client):
+def client_server_kommunikation(args):
+    client, client_adresse = args
     benutzername = ""
 
     # Nachrichten vom Client empfangen und verarbeiten
@@ -47,8 +48,11 @@ def client_server_kommunikation(client):
         # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
         nachrichtentyp = empfangen[0]
         empfangen = empfangen[1:]
-
-        if nachrichtentyp == "1": # Client schickt Benutzernamen
+        if nachrichtentyp == "0": # Client hat Verbindung getrennt 
+            client.close()
+            print(client_adresse, "hat die Verbindung getrennt")
+            break
+        elif nachrichtentyp == "1": # Client schickt Benutzernamen
             benutzername = empfangen
             print(benutzername, "ist nun angemeldet")
         elif nachrichtentyp == "3": # Client schickt Nachricht
@@ -66,6 +70,9 @@ def nachrichten_an_client_schicken(client, benutzername):
 
     # Liste durch JSON-Modul in String umwandeln
     nachrichten_als_string = json.dumps(nachrichten_mit_client)
+
+    # Nummer des Nachrichtentyps anfügen
+    nachrichten_als_string = "5" + nachrichten_als_string
     
     sendeStr(client, nachrichten_als_string)
     sendeTrennByte(client)
@@ -135,12 +142,15 @@ def empfangeStr(komm_s):
 
     while weiter:
         chunk = komm_s.recv(1)
-        if chunk == endByte or chunk == bytes([]):
-            
+        if chunk == endByte:
+            print(chunk)
             if len(datenBytes) > 0: # Falls Daten empfangen wurden und TrennByte Ende der Nachricht signalisiert
                 weiter = False
             else: # Falls leere Nachricht empfangen wurde
                 print("leere Nachricht empfangen!")
+                
+        elif chunk == bytes([]): # wird empfangen, wenn Verbindung Client Verbindung getrennt hat
+            return "0" # Nachrichtencode, dass Client Verbindung getrennt hat
                 
         else:
             datenBytes = datenBytes + chunk
