@@ -13,7 +13,7 @@ def main():
 def initNickFenster(gui):
     global window
     window = gui
-    l = tk.Message(window,text="""Bitte geben Sie einen Benutzernamen ein.
+    l = tk.Label(window,text="""Bitte geben Sie einen Benutzernamen ein.\n
     (Ohne Leerzeichen und Komma)""",width=100).grid()
     t = tk.Text(window,height = 1, width =45)
     e = tk.Label(window,text="")

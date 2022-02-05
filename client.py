@@ -13,7 +13,7 @@ client.settimeout(10)
 try:
     nickname = nameGetGui.main()
     ip,port = serverIP_Eingabe.getIP().split(":")
-except ValueError:
+except:
     print("Sie haben Abbrechen gedrückt")
 print(nickname, "Im client")
 print(ip,port)

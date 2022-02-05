@@ -5,13 +5,18 @@ import socketLib
 def chatGui(fenster):
     global window
     window = fenster
-    toprow = tk.Frame(window,bg="#A9A9A9")
-    tk.Button(toprow,text="Schließen",command= chatSchliessen).grid(row=0,column=0)
-    tk.Button(toprow,text="refresh",command= refresh).grid(row=0,column=1)
+    toprow = tk.Frame(window,bg="#A9A9A9", height=50)
     chatverlauf = tk.Frame(window, bg="#D3D3D3")
+    verlauf = tk.Label(chatverlauf,text="Es sind keine Nachrichten vorhanden, drücke auf 'refresh'",width=50)
+    tk.Button(toprow,text="Schließen",command= chatSchliessen).grid(row=0,column=0)
+    tk.Button(toprow,text="refresh",command= lambda: refresh(verlauf)).grid(row=0,column=2)
     bottomrow = tk.Frame(window, bg="#A9A9A9")
     text_input = tk.Text(bottomrow, height = 2, width=50).grid(row=2,column=0)
     tk.Button(bottomrow,text="Absenden", command= lambda: text_absenden(text_input))
+    toprow.pack()
+    verlauf.pack()
+    chatverlauf.pack()
+    bottomrow.pack()
     return window
 
 def chatAuswahl(fenster):
@@ -33,13 +38,13 @@ def text_absenden(text):
     window.destroy()
 
 
-def refresh():
+def refresh(chat_verlauf):
     global client, nickname
     socketLib.sendeStr(client,"4"+nickname)
     socketLib.sendeTrennByte(client)
-    nachricht = socketLib.empfangeStr(client)
-    print(stuff)
-
+    nachricht_raw = socketLib.empfangeStr(client)
+    nachricht = nachrichtFTjson.nachrichtFjson(nachricht_raw)
+    
 
 def starteChat(client_socket,nick):
     global client, nickname
@@ -47,5 +52,5 @@ def starteChat(client_socket,nick):
     nickname = nick
     app = tk.Tk()
     app.title("Chatauswahl")
-    app = chatGui(chat)
+    app = chatGui(app)
     app.mainloop()
