@@ -13,4 +13,5 @@ def getKommPartner(string):
 
 
 def nachrichtTjson(sender,empfaenger,nachricht):
-    return str({"sender":sender,"empfaenger":empfaenger,"nachricht":nachricht})
+    x = json.loads( str({"sender":sender,"empfaenger":empfaenger,"nachricht":nachricht}))
+    return json.dumps(x)
