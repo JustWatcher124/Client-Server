@@ -9,7 +9,7 @@ def empfangeStr(komm_s):
             weiter = False
         else:
             datenBytes = datenBytes + chunk
-    datenStr = str(datenBytes, 'utf-8')
+    datenStr = datenBytes.decode('utf-8').replace("'",'"')
     return datenStr
 
 

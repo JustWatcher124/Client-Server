@@ -1,6 +1,7 @@
 import socket
 import threading
 import json
+from socketLib import *
 from datetime import datetime
 
 # Client-Server-Protokoll
@@ -43,7 +44,7 @@ NACHRICHTEN = {}
 def main():
 
     nachrichten_backup_einlesen()
-    
+
     server = socket.socket()
     server.bind(("", PORT))
     server.listen(30)
@@ -58,14 +59,14 @@ def main():
         # So können mehrere Verbindungen/Programmabschnitte gleichzeitig und parallel ausgeführt werden
         komm_thread = threading.Thread(target=client_server_kommunikation, args=((client,client_adresse),))
         komm_thread.start()
-        
+
 
 def client_server_kommunikation(args):
     global NACHRICHTEN
 
     client, client_adresse = args
     benutzername = ""
-    try: 
+    try:
         # Nachrichten vom Client empfangen und verarbeiten
         while True:
             empfangen = empfangeStr(client)
@@ -74,7 +75,7 @@ def client_server_kommunikation(args):
             # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
             nachrichtentyp = empfangen[0]
             empfangen = empfangen[1:]
-            if nachrichtentyp == "0": # Client hat Verbindung getrennt 
+            if nachrichtentyp == "0": # Client hat Verbindung getrennt
                 client.close()
                 raise ConnectionResetError # springt in except Teil
             elif nachrichtentyp == "1": # Client schickt Benutzernamen
@@ -94,7 +95,7 @@ def client_server_kommunikation(args):
                 print("Nachricht von", benutzername, client_adresse, "gespeichert")
             else:
                 print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
-                
+
     except ConnectionResetError:
         print(benutzername, client_adresse, "hat die Verbindung getrennt")
         return # beendet diese Funktion und diesen Thread
@@ -158,7 +159,7 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
 
     # Nummer des Nachrichtentyps anfügen
     chat_als_string = "5" + chat_als_string
-    
+
     sendeStr(client, chat_als_string)
     sendeTrennByte(client)
 
@@ -214,8 +215,8 @@ def nachricht_speichern(sender, empfangene_daten):
     nachrichten_datei = open("nachrichten.json", "wt")
     nachrichten_datei.write(nachrichten_str)
     nachrichten_datei.close()
-    
-        
+
+
 
 def nachrichten_backup_einlesen():
     global NACHRICHTEN
@@ -225,54 +226,22 @@ def nachrichten_backup_einlesen():
         datei = open("nachrichten.json", "rt")
         daten = datei.read()
         datei.close()
-        
+
         if len(daten) > 0: # Falls Daten vorhanden
-            NACHRICHTEN = json.loads(daten) # Daten durch JSON-Modul wieder in Liste und Dictionary umwandeln            
+            NACHRICHTEN = json.loads(daten) # Daten durch JSON-Modul wieder in Liste und Dictionary umwandeln
             print("gespeicherte Nachrichten erfolgreich eingelesen")
             print(NACHRICHTEN)
-            
+
         else: # Falls Datei leer
             NACHRICHTEN = {}
             print("keine gespeicherten Nachrichten gefunden")
-            
+
     except FileNotFoundError: # Falls "nachrichten.json" noch nicht existiert
         NACHRICHTEN = {}
         datei = open("nachrichten.json", "x")
         datei.close()
         print("keine gespeicherten Nachrichten gefunden")
-        
 
-def empfangeStr(komm_s):
-    weiter = True
-    datenBytes = bytes()
-
-    endByte = bytes([0])
-
-    while weiter:
-        chunk = komm_s.recv(1)
-        if chunk == endByte:
-            if len(datenBytes) > 0: # Falls Daten empfangen wurden und TrennByte Ende der Nachricht signalisiert
-                weiter = False
-            else: # Falls leere Nachricht empfangen wurde
-                print("leere Nachricht empfangen!")
-                
-        elif chunk == bytes([]): # wird empfangen, wenn Verbindung Client Verbindung getrennt hat
-            return "0" # Nachrichtencode, dass Client Verbindung getrennt hat
-                
-        else:
-            datenBytes = datenBytes + chunk
-
-    datenStr = str(datenBytes, 'utf-8')
-
-    return datenStr
-
-def sendeStr(komm_s, datenStr):
-    datenBytes = bytes(datenStr, 'utf-8')
-    komm_s.sendall(datenBytes)
-
-def sendeTrennByte(komm_s):
-    trennByte = bytes([0])
-    komm_s.sendall(trennByte)
 
 # Start
 if __name__ == "__main__":
