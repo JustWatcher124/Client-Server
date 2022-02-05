@@ -104,30 +104,18 @@ def nachrichten_an_client_schicken(client, benutzername):
     
 
 def nachricht_speichern(sender, empfangene_daten):
-    # Aufbau von empfangene_daten: "Empfänger Nachricht" -> Ab Leerzeichen nach Empfänger beginnt Nachricht
+    # Aufbau von empfangene_daten: {"sender": "...",
+    #                  "empfaenger": "...",
+    #                  "datum": "hh:mm:ss,DD:MM:YYYY",
+    #                  "nachricht": "..."}
+    #                 }
 
-    # Aufteilen der Daten in Empfänger und Nachricht
-    index_trennzeichen = empfangene_daten.index(" ")
-    empfaenger = empfangene_daten[:index_trennzeichen]
-    nachricht = empfangene_daten[index_trennzeichen+1:]
+    nachricht = json.loads(daten)
+    empfaenger = nachricht["empfaenger"]
+    sender = nachricht["sender"]
 
-    # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
-    jetzt = datetime.now()
-    stunde = str(datetime.hour)
-    minute = str(datetime.minute)
-    sekunde = str(datetime.second)
-    tag = str(datetime.day)
-    monat = str(datetime.month)
-    jahr = str(datetime.year)
-    datum = "{hh}:{mm}:{ss},{DD}:{MM}:{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
+    
 
-    # Nachricht mit Daten in die globale Liste anhängen
-    NACHRICHTEN.append({
-        "sender" : sender,
-        "empfaenger" : empfaenger,
-        "nachricht" : nachricht,
-        "datum" : datum
-        })
 
     # "Backup" der Nachrichten in externer Datei "nachrichten.json" speichern
     nachrichten_str = json.dumps(NACHRICHTEN) # Liste durch JSON-Modul in String umwandeln
