@@ -9,12 +9,16 @@ PORT = 5000
 NUTZER = []
 
 # alle Nachrichten
-NACHRICHTEN = []
-##    [{"sender" : "...",
-##      "empfaenger" : "...",
-##      "nachricht" : "...",
-##      "datum" : "hh:mm:ss,DD:MM:YYYY"
-##        }]
+NACHRICHTEN = {}
+##    {"benutzername1":{
+##          "kommunikationspartner1":[
+##              {"sender": "...",
+##               "empfaenger": "...",
+##               "datum": "hh:mm:ss,DD:MM:YYYY",
+##               "nachricht": "..."}
+##              }
+##          ]
+##      }
 
 
 def main():
@@ -53,7 +57,9 @@ def client_server_kommunikation(args):
                 raise ConnectionResetError # springt in except Teil
             elif nachrichtentyp == "1": # Client schickt Benutzernamen
                 benutzername = empfangen
-                print(benutzername, "ist nun angemeldet")
+                if benutzername not in NACHRICHTEN.keys():
+                    benutzer_registrieren(benutzername)
+                print(client_adresse, "ist nun als", benutzername, "angemeldet")
             elif nachrichtentyp == "3": # Client schickt Nachricht
                 nachricht_speichern(benutzername, empfangen)
                 print("Nachricht von", benutzername, client_adresse, "gespeichert")
@@ -67,11 +73,21 @@ def client_server_kommunikation(args):
         print(client_adresse, "hat die Verbindung getrennt")
         return # beendet diese Funktion und diesen Thread
 
-def nachrichten_an_client_schicken(client, benutzername):
-    # Nachrichten, die vom oder an den Client gesendet wurden
-    nachrichten_mit_client = [n for n in NACHRICHTEN if n["sender"] == benutzername or n["empfaenger"] == benutzername]
+def benutzer_registrieren(neuer_nutzer):
+    # benutzername als neuen Kommunikationspartner bei allen aneren Nutzern hinzufügen
+    for nutzer in NACHRICHTEN.keys():
+        NACHRICHTEN[nutzer][neuer_nutzer] = []
 
-    # Liste durch JSON-Modul in String umwandeln
+    # benutzername als neuen Nutzer zu Nachrichten hinzufügen
+    alle_anderen_nutzer = NACHRICHTEN.keys()
+    alle_anderen_nutzer[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
+
+
+def nachrichten_an_client_schicken(client, benutzername):
+    # alle Chats des benutzers
+    nachrichten_mit_client = NACHRICHTEN[benutzername]
+
+    # Dictionary durch JSON-Modul in String umwandeln
     nachrichten_als_string = json.dumps(nachrichten_mit_client)
 
     # Nummer des Nachrichtentyps anfügen
