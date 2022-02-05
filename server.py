@@ -82,6 +82,12 @@ def benutzer_registrieren(neuer_nutzer):
     alle_anderen_nutzer = NACHRICHTEN.keys()
     alle_anderen_nutzer[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
 
+    # Änderungen in nachrichten.json speichern
+    nachrichten_str = json.dumps(NACHRICHTEN)
+    nachrichten_datei = open("nachrichten.json", "wt")
+    nachrichten_datei.write(nachrichten_str)
+    nachrichten_datei.close()
+
 
 def nachrichten_an_client_schicken(client, benutzername):
     # alle Chats des benutzers
