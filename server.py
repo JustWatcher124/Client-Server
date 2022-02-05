@@ -40,29 +40,32 @@ def main():
 def client_server_kommunikation(args):
     client, client_adresse = args
     benutzername = ""
-
-    # Nachrichten vom Client empfangen und verarbeiten
-    while True:
-        empfangen = empfangeStr(client)
-        # An der ersten Stelle ist immer der Typ der Nachricht festgelegt
-        # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
-        nachrichtentyp = empfangen[0]
-        empfangen = empfangen[1:]
-        if nachrichtentyp == "0": # Client hat Verbindung getrennt 
-            client.close()
-            print(client_adresse, "hat die Verbindung getrennt")
-            break
-        elif nachrichtentyp == "1": # Client schickt Benutzernamen
-            benutzername = empfangen
-            print(benutzername, "ist nun angemeldet")
-        elif nachrichtentyp == "3": # Client schickt Nachricht
-            nachricht_speichern(benutzername, empfangen)
-            print("Nachricht von", benutzername, "gespeichert")
-        elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
-            nachrichten_an_client_schicken(client, benutzername)
-            print("Nachrichten an", benutzername, "gesendet")
-        else:
-            print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername)
+    try: 
+        # Nachrichten vom Client empfangen und verarbeiten
+        while True:
+            empfangen = empfangeStr(client)
+            # An der ersten Stelle ist immer der Typ der Nachricht festgelegt
+            # Dadurch wird festgelegt, welche Daten geschickt oder angefordert werden
+            nachrichtentyp = empfangen[0]
+            empfangen = empfangen[1:]
+            if nachrichtentyp == "0": # Client hat Verbindung getrennt 
+                client.close()
+                raise ConnectionResetError # springt in except Teil
+            elif nachrichtentyp == "1": # Client schickt Benutzernamen
+                benutzername = empfangen
+                print(benutzername, "ist nun angemeldet")
+            elif nachrichtentyp == "3": # Client schickt Nachricht
+                nachricht_speichern(benutzername, empfangen)
+                print("Nachricht von", benutzername, client_adresse, "gespeichert")
+            elif nachrichtentyp == "4": # Client fordert von ihm gesendete und an ihn gerichtete Nachrichten an
+                nachrichten_an_client_schicken(client, benutzername)
+                print("Nachrichten an", benutzername, "gesendet")
+            else:
+                print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
+                
+    except ConnectionResetError:
+        print(client_adresse, "hat die Verbindung getrennt")
+        return # beendet diese Funktion und diesen Thread
 
 def nachrichten_an_client_schicken(client, benutzername):
     # Nachrichten, die vom oder an den Client gesendet wurden
@@ -143,7 +146,6 @@ def empfangeStr(komm_s):
     while weiter:
         chunk = komm_s.recv(1)
         if chunk == endByte:
-            print(chunk)
             if len(datenBytes) > 0: # Falls Daten empfangen wurden und TrennByte Ende der Nachricht signalisiert
                 weiter = False
             else: # Falls leere Nachricht empfangen wurde
