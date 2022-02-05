@@ -162,7 +162,7 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     sendeStr(client, chat_als_string)
     sendeTrennByte(client)
 
-    # nachrichten auf gelesen setzen
+    # Nachrichten auf gelesen setzen
     for i in range(len(chat) - 1, -1, -1):  # durchläuft Indices der Liste rückwärts
         if chat[i]["gelesen"] == True: # bricht ab, wenn gelesene Nachricht gefunden wird
             break
@@ -172,12 +172,18 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
 def nachricht_speichern(sender, empfangene_daten):
     global NACHRICHTEN
 
+
     # Aufbau von empfangene_daten: {"sender": "...",
     #                  "empfaenger": "...",
     #                  "nachricht": "..."}
     #                 }
 
     nachricht = json.loads(empfangene_daten)
+
+    # falls Empfänger noch nicht im registriert ist
+    empfaenger = nachricht["empfaenger"]
+    if empfaenger not in NACHRICHTEN.keys():
+        benutzer_registrieren(empfaenger)
 
     # Datum muss noch hinzugefügt werden
     # Aufbau Datum in der Nachricht : "hh:mm:ss,DD:MM:YYYY"
