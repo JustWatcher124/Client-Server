@@ -3,6 +3,18 @@ import threading
 import json
 from datetime import datetime
 
+# Client-Server-Protokoll
+# Aufbau des empfangenen Strings bei Kommunikation immer:
+#  1. Zeichen: Nachrichtencode
+#  ab 2. Zeichen: Nutzdaten
+# (Nachrichtencodes, zum identifizieren, welche Art von Daten empfangen wurden)
+# 1-> Client schickt Benutzername an Server
+# 2->
+# 3-> Benutzer hat neue Nachricht gesendet -> Server speichert nun die Nachricht
+# 4-> Client fordert von ihm und an ihn gesendete Nachrichten an -> Server antwortet mit 5
+# 5-> Server schickt alle Nachrichten von und an Benutzer an dessen Client
+
+
 PORT = 5000
 
 # alle Nutzer
@@ -80,7 +92,7 @@ def benutzer_registrieren(neuer_nutzer):
 
     # benutzername als neuen Nutzer zu Nachrichten hinzufügen
     alle_anderen_nutzer = NACHRICHTEN.keys()
-    alle_anderen_nutzer[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
+    NACHRICHTEN[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
 
     # Änderungen in nachrichten.json speichern
     nachrichten_str = json.dumps(NACHRICHTEN)
@@ -114,7 +126,7 @@ def nachricht_speichern(sender, empfangene_daten):
     empfaenger = nachricht["empfaenger"]
     sender = nachricht["sender"]
 
-    
+
 
 
     # "Backup" der Nachrichten in externer Datei "nachrichten.json" speichern
