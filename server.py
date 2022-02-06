@@ -192,7 +192,7 @@ def nachricht_speichern(sender, empfangene_daten):
     tag = str(jetzt.day)
     monat = str(jetzt.month)
     jahr = str(jetzt.year)
-    datum = "{hh}:{mm}:{ss},{DD}:{MM}:{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
+    datum = "{hh}:{mm}:{ss},{DD}.{MM}.{YYYY}".format(hh=stunde, mm=minute, ss=sekunde, DD=tag, MM=monat, YYYY=jahr)
 
     # Datum in Nachricht speichern
     nachricht["datum"] = datum
