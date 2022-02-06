@@ -19,6 +19,7 @@ def gui(fenster):
     kein_verlauf.grid()
     chatverlauf.grid()
     bottomrow.grid()
+    refresh(kein_verlauf,chatverlauf)
     return window
 
 
