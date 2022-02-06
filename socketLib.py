@@ -5,10 +5,18 @@ def empfangeStr(komm_s):
     endByte = bytes([0])
     while weiter:
         chunk = komm_s.recv(1)
-        if chunk == endByte or chunk == bytes([]):
-            weiter = False
+        if chunk == endByte:
+            if len(datenBytes) > 0:  # Falls Daten empfangen wurden und TrennByte Ende der Nachricht signalisiert
+                weiter = False
+            else:  # Falls leere Nachricht empfangen wurde
+                print("leere Nachricht empfangen!")
+
+        elif chunk == bytes([]):  # wird empfangen, wenn Verbindung Client Verbindung getrennt hat
+            return "0"  # Nachrichtencode, dass Client Verbindung getrennt hat
+
         else:
             datenBytes = datenBytes + chunk
+
     datenStr = datenBytes.decode('utf-8').replace("'",'"')
     return datenStr
 
