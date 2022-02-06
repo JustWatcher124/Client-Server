@@ -161,12 +161,11 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     sendeStr(client, chat_als_string)
     sendeTrennByte(client)
 
-    # Nachrichten auf gelesen setzen
-    for i in range(len(chat) - 1, -1, -1):  # durchläuft Indices der Liste rückwärts
-        if chat[i]["gelesen"] == True: # bricht ab, wenn gelesene Nachricht gefunden wird
-            break
-        else:
-            chat[i]["gelesen"] = True # setzt Nachricht auf gelesen
+    # Falls letzte Nachricht an Benutzer gerichtet war und dieser die Nachricht abgefragt hat
+    if not chat[len(chat)-1]["gelesen"] and chat[len(chat)-1]["empfaenger"] == benutzername:
+        # alle Nachrichten auf gelesen setzen
+        for nachricht in chat:
+            nachricht["gelesen"] = True
 
 def nachricht_speichern(sender, empfangene_daten):
     global NACHRICHTEN
@@ -221,17 +220,17 @@ def nachrichten_backup_einlesen():
 
         if len(daten) > 0: # Falls Daten vorhanden
             NACHRICHTEN = json.loads(daten) # Daten durch JSON-Modul wieder in Liste und Dictionary umwandeln
-            print("gespeicherte Nachrichten erfolgreich eingelesen")
+            print("Backup erfolgreich eingelesen")
 
         else: # Falls Datei leer
             NACHRICHTEN = {}
-            print("keine gespeicherten Nachrichten gefunden")
+            print("kein Backup gefunden")
 
     except FileNotFoundError: # Falls "nachrichten.json" noch nicht existiert
         NACHRICHTEN = {}
         datei = open("nachrichten.json", "x")
         datei.close()
-        print("keine gespeicherten Nachrichten gefunden")
+        print("kein Backup gefunden")
 
 def mache_backups():
     global NACHRICHTEN
@@ -241,7 +240,8 @@ def mache_backups():
         time.sleep(30)
 
         # Backup der Nachrichten in externer Datei "nachrichten.json" speichern
-        nachrichten_str = json.dumps(NACHRICHTEN)  # Liste durch JSON-Modul in String umwandeln
+        nachrichten_str = json.dumps(NACHRICHTEN, indent=4)  # Liste durch JSON-Modul in String umwandeln
+
         nachrichten_datei = open("nachrichten.json", "wt")
         nachrichten_datei.write(nachrichten_str)
         nachrichten_datei.close()
