@@ -3,6 +3,7 @@ import threading
 import json
 from socketLib import *
 from datetime import datetime
+import time
 
 # Client-Server-Protokoll
 # Aufbau des empfangenen Strings bei Kommunikation immer:
@@ -49,11 +50,15 @@ def main():
     server.bind(("", PORT))
     server.listen(30)
 
-    print("Server lauscht nun auf Port",PORT)
+    # Thread um regelmäßig backups in "nachrichten.json" zu speichern
+    backup_thread = threading.Thread(target=mache_backups)
+    backup_thread.start()
+
+    print("Server lauscht nun auf Port",PORT,"\n")
 
     while True:
         client, client_adresse = server.accept()
-        print("Verbindung mit", client_adresse, "aufgebaut")
+        print("Verbindung mit", client_adresse, "aufgebaut\n")
 
         # Ausführen von client_server_kommunikation() im Hintergrund durch Multithreading
         # So können mehrere Verbindungen/Programmabschnitte gleichzeitig und parallel ausgeführt werden
@@ -82,22 +87,22 @@ def client_server_kommunikation(args):
                 benutzername = empfangen
                 if benutzername not in NACHRICHTEN.keys():
                     benutzer_registrieren(benutzername)
-                print(client_adresse, "ist nun als", benutzername, "angemeldet")
+                print(client_adresse, "ist nun als", benutzername, "angemeldet\n")
             elif nachrichtentyp == "2": # Client frägt Chatübersicht an
                 chatuebersicht_schicken(client, benutzername)
-                print("Chatüberischt wurde an", benutzername, client_adresse, "geschickt")
+                print("Chatüberischt wurde an", benutzername, client_adresse, "geschickt\n")
             elif nachrichtentyp == "4": # Client fordert Chatverlauf mit Kommunikationspartner an
                 kommunikationspartner = empfangen
                 chat_an_client_schicken(client, benutzername, kommunikationspartner)
-                print("Chatverlauf mit", kommunikationspartner,"an", benutzername, client_adresse, "gesendet")
+                print("Chatverlauf mit", kommunikationspartner,"an", benutzername, client_adresse, "gesendet\n")
             elif nachrichtentyp == "6": # Client schickt Nachricht
                 nachricht_speichern(benutzername, empfangen)
-                print("Nachricht von", benutzername, client_adresse, "gespeichert")
+                print("Nachricht von", benutzername, client_adresse, "gespeichert\n")
             else:
-                print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse)
+                print("ungueltiger Nachrichtentyp", nachrichtentyp, "von", benutzername, client_adresse,"\n")
 
     except ConnectionResetError:
-        print(benutzername, client_adresse, "hat die Verbindung getrennt")
+        print(benutzername, client_adresse, "hat die Verbindung getrennt\n")
         return # beendet diese Funktion und diesen Thread
 
 def chatuebersicht_schicken(client, benutzername):
@@ -141,13 +146,6 @@ def benutzer_registrieren(neuer_nutzer):
     NACHRICHTEN[neuer_nutzer] = {n:[] for n in alle_anderen_nutzer}
 
 
-    # Änderungen in nachrichten.json speichern
-    nachrichten_str = json.dumps(NACHRICHTEN)
-    nachrichten_datei = open("nachrichten.json", "wt")
-    nachrichten_datei.write(nachrichten_str)
-    nachrichten_datei.close()
-
-
 def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     global NACHRICHTEN
 
@@ -156,7 +154,6 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
 
     # Dictionary durch JSON-Modul in String umwandeln
     chat_als_string = json.dumps(chat)
-    print(chat_als_string)
 
     # Nummer des Nachrichtentyps anfügen
     chat_als_string = "5" + chat_als_string
@@ -211,12 +208,6 @@ def nachricht_speichern(sender, empfangene_daten):
     NACHRICHTEN[empfaenger][sender].append(nachricht)
     NACHRICHTEN[sender][empfaenger].append(nachricht)
 
-    # "Backup" der Nachrichten in externer Datei "nachrichten.json" speichern
-    nachrichten_str = json.dumps(NACHRICHTEN) # Liste durch JSON-Modul in String umwandeln
-    nachrichten_datei = open("nachrichten.json", "wt")
-    nachrichten_datei.write(nachrichten_str)
-    nachrichten_datei.close()
-
 
 
 def nachrichten_backup_einlesen():
@@ -231,7 +222,6 @@ def nachrichten_backup_einlesen():
         if len(daten) > 0: # Falls Daten vorhanden
             NACHRICHTEN = json.loads(daten) # Daten durch JSON-Modul wieder in Liste und Dictionary umwandeln
             print("gespeicherte Nachrichten erfolgreich eingelesen")
-            print(NACHRICHTEN)
 
         else: # Falls Datei leer
             NACHRICHTEN = {}
@@ -243,6 +233,20 @@ def nachrichten_backup_einlesen():
         datei.close()
         print("keine gespeicherten Nachrichten gefunden")
 
+def mache_backups():
+    global NACHRICHTEN
+
+    # Wiederholt sich alle 30 Sekunden
+    while True:
+        time.sleep(30)
+
+        # Backup der Nachrichten in externer Datei "nachrichten.json" speichern
+        nachrichten_str = json.dumps(NACHRICHTEN)  # Liste durch JSON-Modul in String umwandeln
+        nachrichten_datei = open("nachrichten.json", "wt")
+        nachrichten_datei.write(nachrichten_str)
+        nachrichten_datei.close()
+
+        print("Backup gespeichert\n")
 
 # Start
 if __name__ == "__main__":
