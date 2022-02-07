@@ -58,7 +58,7 @@ def refresh(partners,names):
     clear_widgets(partners)
     if len(names)>0:
         for partner in names:
-            tk.Button(partners,text=partner, command= lambda: chat_Aufruf(names.index(partner))).pack()
+            tk.Button(partners,text=partner, command= lambda: chat_Aufruf(self["text]) )pack()
     else:
         tk.Label(partners,text="Sie haben keine Chatverläufe!").pack()
     return partners
@@ -70,12 +70,14 @@ def guiSchliessen():
 
 
 def chat_Aufruf(name):
-    global window, chat_partner, new_chat, name_liste
-    chat_partner = name_liste[name]
+    global window, chat_partner, new_chat
+    chat_partner = name
     new_chat = False
     print("Chat mit",chat_partner," aufgerufen")
     window.destroy()
 
+
+    
 
 def starteGui(client_socket,nick):
     global client, nickname, chat_partner, new_chat
