@@ -162,10 +162,11 @@ def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     sendeTrennByte(client)
 
     # Falls letzte Nachricht an Benutzer gerichtet war und dieser die Nachricht abgefragt hat
-    if not chat[len(chat)-1]["gelesen"] and chat[len(chat)-1]["empfaenger"] == benutzername:
-        # alle Nachrichten auf gelesen setzen
-        for nachricht in chat:
-            nachricht["gelesen"] = True
+    if chat:
+        if not chat[len(chat)-1]["gelesen"] and chat[len(chat)-1]["empfaenger"] == benutzername:
+            # alle Nachrichten auf gelesen setzen
+            for nachricht in chat:
+                nachricht["gelesen"] = True
 
 def nachricht_speichern(sender, empfangene_daten):
     global NACHRICHTEN
@@ -251,3 +252,4 @@ def mache_backups():
 # Start
 if __name__ == "__main__":
     main()
+
