@@ -1,5 +1,6 @@
 import tkinter as tk
 from nachrichtFormatter import *
+from functools import partial
 from socketLib import *
 import chatGui
 chat_partner = ""
@@ -53,12 +54,18 @@ def clear_widgets(tk_frame):
 
 
 def refresh(partners,names):
-    global name_liste
+    global name_liste#, btn_liste
     name_liste = names
     clear_widgets(partners)
     if len(names)>0:
         for partner in names:
-            tk.Button(partners,text=partner, command= lambda: chat_Aufruf(self["text]) )pack()
+            # cmd = lambda: chat_Aufruf(str(btn["text"]))
+            x = "chat_Aufruf(\""+str(partner)+"\")"
+            
+            btn = tk.Button(partners,text=partner, command=partial(chat_Aufruf, str(partner)))
+            btn.pack()
+            print(btn)
+
     else:
         tk.Label(partners,text="Sie haben keine Chatverläufe!").pack()
     return partners
@@ -88,4 +95,5 @@ def starteGui(client_socket,nick):
     app.title("Chatauswahl")
     app = gui(app,partner)
     app.mainloop()
+    new_chat = False
     chatGui.starteGui(client,nickname,chat_partner,new_chat)
