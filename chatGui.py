@@ -61,15 +61,18 @@ def refresh(kein_verlauf,chat_verlauf):
 
 def make_chatVerlauf(anzeige,verlauf_raw):
     global nickname, partner
-    for message in verlauf_raw:
-        mes = ""
-        seite = [(0,"#a9a9a9"),(1,"#90ee90")][1 if message["sender"]==nickname else 0]
-        n = message["sender"]
-        t = message["nachricht"]
-        z = message["datum"].split(",")[1]
-        d = message["datum"].split(",")[0]
-        mes = z+" "+d+" "+n+"\n"+t
-        tk.Label(anzeige,text=mes,bg=seite[1]).grid(column=seite[0])
+    if verlauf_raw == '':
+        tk.Label(anzeige,text="Es gibt keine Nachrichten!").grid()
+    else:
+        for message in verlauf_raw:
+            mes = ""
+            seite = [(0,"#a9a9a9"),(1,"#90ee90")][1 if message["sender"]==nickname else 0]
+            n = message["sender"]
+            t = message["nachricht"]
+            z = message["datum"].split(",")[1]
+            d = message["datum"].split(",")[0]
+            mes = z+" "+d+" "+n+"\n"+t
+            tk.Label(anzeige,text=mes,bg=seite[1]).grid(column=seite[0])
 
 
 def starteGui(client_socket,nick,partner, new_chat):
@@ -82,3 +85,4 @@ def starteGui(client_socket,nick,partner, new_chat):
     app.title("Ihr Chat mit:"+komm_partner)
     app = gui(app)
     app.mainloop()
+
