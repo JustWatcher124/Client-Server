@@ -46,7 +46,7 @@ def text_absenden(text,k_v,cv):
     nachricht = text.get(1.0,"end-1c")
     nachricht_zum_server(nachricht)
     neuer_chat = False
-    text.delete("1.0","end-1c"
+    text.delete("1.0","end-1c")
     refresh(k_v,cv)
 
 # Funktion unter text_absenden()
