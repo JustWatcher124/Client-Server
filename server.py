@@ -149,6 +149,10 @@ def benutzer_registrieren(neuer_nutzer):
 def chat_an_client_schicken(client, benutzername, kommunikationspartner):
     global NACHRICHTEN
 
+    if kommunikationspartner not in NACHRICHTEN.keys():
+        benutzer_registrieren(kommunikationspartner)
+
+    
     # alle Nachrichten des Benutzers mit dem Kommunikationspartner
     chat = NACHRICHTEN[benutzername][kommunikationspartner]
 
@@ -252,4 +256,6 @@ def mache_backups():
 # Start
 if __name__ == "__main__":
     main()
+
+
 
