@@ -16,7 +16,7 @@ client = socket.socket()
 client.settimeout(10) # Sockettimeout = Zeit bis der Client nach Verbindungsabbruch einen Fehler bringt
 try:
     nickname = nameGetGui.main()
-    if nickname = "":
+    if nickname == "":
         raise NickNameError()
     ip,port = serverIP_Eingabe.getIP().split(":")
 except NickNameError:
