@@ -1,7 +1,9 @@
 import tkinter as tk
 serverip = ""
+# Eingabefenster für die IP und den Port des Servers
 
 
+# Funktion zum Überprüfen ob die eingaben gut sind
 def eingabe_lesen(ip,er_ip,port,er_port):
     global serverip
     global window
@@ -16,6 +18,8 @@ def eingabe_lesen(ip,er_ip,port,er_port):
     if not is_it_port(p):
         er_port.config(text="Das ist kein gültiger Port")
 
+# Funktion die überprüft ob aus dem eingegebenen String port ein int
+# gemacht werden kann (Das ist unser Kriterium für Ports)
 def is_it_port(port):
     try:
         int(port)
@@ -23,7 +27,7 @@ def is_it_port(port):
         return False
     return True
 
-
+# Funktion zum Befüllen des Fensters
 def serverIPGui(fenster):
     global window
     window = fenster
@@ -31,9 +35,6 @@ def serverIPGui(fenster):
 
     eingabe_IP = tk.Text(window,height=1,width=50)
     error_IP = tk.Label(window,text="")
-
-
-
 
     eingabe_Port = tk.Text(window,height=1,width=50)
     error_PORT = tk.Label(window,text="")
@@ -50,6 +51,9 @@ def serverIPGui(fenster):
     tk.Button(window,text="Standard", command=standard).grid()
     return window
 
+
+# Funktion zum Überprüfen ob der eingegebene String ip
+# im Format "X.X.X.X" wo X ein int von 0 - 999 ist
 def is_it_ip_format(ip):
     ip = ip.split(".")
     try:
@@ -69,12 +73,15 @@ def abbruch():
     serverip = "A"
     window.destroy()
 
+# Standart-IP und Port des Servers ist 127.0.0.1:5000
+# Auch hier zur Vereinfachung des Testens
 def standard():
     global serverip, window
     serverip = "127.0.0.1:5000"
     window.destroy()
 
-
+# Start-Funktion die das Fenster kontrolliert
+# Gibt die eingebene Server IP zurück als String ("127.0.0.1:5000")
 def getIP():
     global serverip
     chat = tk.Tk()
