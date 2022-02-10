@@ -1,3 +1,5 @@
+# Bibliothek für die Übertragung und das Empfangen von Daten zwischen Sockets
+# (Nur Kleine, json begründete Änderungen in empfangeStr()
 
 def empfangeStr(komm_s):
     weiter = True
@@ -16,7 +18,7 @@ def empfangeStr(komm_s):
 
         else:
             datenBytes = datenBytes + chunk
-
+    # Musste von der Vorlage überarbeitet werden, weil json nur " annimmt und keine ' um die string-keys zu definieren
     datenStr = datenBytes.decode('utf-8').replace("'",'"')
     return datenStr
 
